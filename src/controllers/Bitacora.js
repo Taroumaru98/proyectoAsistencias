@@ -21,11 +21,17 @@ const bitacoraController = {
             res.status(500).json({ error: 'Error al crear bitácora' });
         }
     },
-    
+
     listarTodo: async (req, res) => {
         try {
-            const bitacoras = await Bitacora.find();
-            console.log('Lista de entradas de bitácora:', bitacoras);
+            const bitacoras = await Bitacora.find({})
+                .populate({
+                    path: 'IdAprendis',
+                    populate: { path: 'IdFicha' }
+                })
+                .exec();
+
+            console.log(bitacoras);
             res.json(bitacoras);
         } catch (error) {
             console.error('Error al listar las entradas de bitácora:', error);
@@ -33,7 +39,7 @@ const bitacoraController = {
         }
     },
 
-   // Listar entradas de bitácora por ID de Aprendis
+    // Listar entradas de bitácora por ID de Aprendis
     listarPorAprendis: async (req, res) => {
         const { idAprendis } = req.params;
         try {
@@ -52,20 +58,20 @@ const bitacoraController = {
         try {
             let array = []
             const bitacoras = await Bitacora.find()
-            .populate('IdAprendis')
+                .populate('IdAprendis')
             for (let i = 0; i < bitacoras.length; i++) {
                 const bitacora = bitacoras[i];
                 const estudiante = {
-                    _id:bitacora?.IdAprendis?.IdFicha,
+                    _id: bitacora?.IdAprendis?.IdFicha,
                     name: {
-                      first: "Future",
-                      last: "Studio"
+                        first: "Future",
+                        last: "Studio"
                     }
-                  };
-                  const isEqual = estudiante._id.equals(IdFicha);
+                };
+                const isEqual = estudiante._id.equals(IdFicha);
                 console.log(bitacora?.IdAprendis?.IdFicha);
                 console.log(IdFicha);
-                if(bitacora?.IdAprendis?.IdFicha === IdFicha || isEqual) {
+                if (bitacora?.IdAprendis?.IdFicha === IdFicha || isEqual) {
                     array.push(bitacora)
                 }
             }
